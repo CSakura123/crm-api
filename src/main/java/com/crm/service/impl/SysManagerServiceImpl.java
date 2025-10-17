@@ -25,6 +25,7 @@ import java.util.List;
  * 服务实现类
  * </p>
  *
+ * @author 小c
 
  */
 @Service
@@ -35,6 +36,9 @@ public class SysManagerServiceImpl extends ServiceImpl<SysManagerMapper, SysMana
     @Override
     public PageResult<SysManagerVO> page(SysManagerQuery query) {
         Page<SysManagerVO> page = new Page<>(query.getPage(), query.getLimit());
+        if (query.getDepartId() != null && !query.getDepartId().isEmpty()) {
+            query.setCheckedDepartId(query.getDepartId().getLast());
+        }
         List<SysManagerVO> list = baseMapper.getManagerPage(page, query);
         return new PageResult<>(list, page.getTotal());
     }

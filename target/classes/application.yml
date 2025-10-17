@@ -46,7 +46,7 @@ springdoc:
 knife4j:
   enable: true
   setting:
-    language: zh_cn
+    language: zh-CN
   basic:
     enable: true    #开启密码模式
     username: admin   #用户名
@@ -64,3 +64,4 @@ auth:
     - /swagger-ui/**
     - /doc.html
     - /                     # 根路径
+    - /department/**
