@@ -9,7 +9,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-10-12T14:29:26+0800",
+    date = "2025-10-22T16:59:27+0800",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.8 (Microsoft)"
 )
 public class SysManagerConvertImpl implements SysManagerConvert {
@@ -27,6 +27,7 @@ public class SysManagerConvertImpl implements SysManagerConvert {
         sysManager.setNickname( vo.getNickname() );
         sysManager.setPassword( vo.getPassword() );
         sysManager.setStatus( vo.getStatus() );
+        sysManager.setDepartId( vo.getDepartId() );
         sysManager.setCreateTime( vo.getCreateTime() );
 
         return sysManager;
@@ -74,6 +75,7 @@ public class SysManagerConvertImpl implements SysManagerConvert {
         sysManagerVO.setNickname( sysManager.getNickname() );
         sysManagerVO.setStatus( sysManager.getStatus() );
         sysManagerVO.setPassword( sysManager.getPassword() );
+        sysManagerVO.setDepartId( sysManager.getDepartId() );
         sysManagerVO.setCreateTime( sysManager.getCreateTime() );
 
         return sysManagerVO;

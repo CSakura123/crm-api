@@ -5,8 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
-
 /**
  * @author crm
  */
@@ -18,8 +16,6 @@ public class SysManagerQuery extends Query {
     private String account;
     @Schema(description = "昵称")
     private String nickname;
-    @Schema(description = "部门id")
-    private Integer checkedDepartId;
-    @Schema(description = "部门ids")
-    private List<Integer> departId;
+    @Schema(description = "账号类型 0-A平台 1-B平台")
+    private Integer type;
 }

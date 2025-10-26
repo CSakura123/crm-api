@@ -6,6 +6,7 @@ import com.crm.entity.Department;
 import com.crm.query.DepartmentQuery;
 import com.crm.query.IdQuery;
 import com.crm.service.DepartmentService;
+import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -31,25 +32,36 @@ import java.util.List;
 @AllArgsConstructor
 public class DepartmentController {
     private final DepartmentService departmentService;
+
+
     @PostMapping("page")
-    public Result<PageResult<Department>> getPage(@RequestBody @Validated DepartmentQuery query){
+    @Operation(summary = "分页查询")
+    public Result<PageResult<Department>> getPage(@RequestBody @Validated DepartmentQuery query) {
         return Result.ok(departmentService.getPage(query));
     }
+
+
     @PostMapping("list")
     @Operation(summary = "部门列表查询")
     public Result<List<Department>> getList() {
         return Result.ok(departmentService.getList());
     }
+
+
     @PostMapping("saveOrEdit")
     @Operation(summary = "保存或编辑部门")
     public Result saveOrEditDepartment(@RequestBody Department department) {
         departmentService.saveOrEditDepartment(department);
         return Result.ok();
     }
+
     @PostMapping("remove")
     @Operation(summary = "删除部门")
     public Result removeDepartment(@RequestBody @Validated IdQuery query) {
         departmentService.removeDepartment(query);
         return Result.ok();
     }
+
+
+
 }

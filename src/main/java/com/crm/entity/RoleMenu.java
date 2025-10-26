@@ -24,7 +24,8 @@ import lombok.Setter;
 @Setter
 @TableName("sys_role_menu")
 @ApiModel(value = "RoleMenu对象", description = "角色菜单关系")
-public class RoleMenu {
+public class
+RoleMenu {
 
     @ApiModelProperty("id")
     @TableId(value = "id", type = IdType.AUTO)

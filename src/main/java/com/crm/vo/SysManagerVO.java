@@ -8,12 +8,11 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * @author crm
+ * @author kimihiro
  */
 @Data
 @Schema(description = "管理员")
@@ -44,7 +43,6 @@ public class SysManagerVO implements Serializable {
 
     @Schema(description = "部门id")
     private Integer departId;
-
 
     @Schema(description = "状态 0：正常    1：停用", required = true)
     @Range(min = 0, max = 1, message = "用户状态不正确")

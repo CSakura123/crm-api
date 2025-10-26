@@ -17,9 +17,30 @@ import java.util.List;
  * @since 2025-10-12
  */
 public interface DepartmentService extends IService<Department> {
-    PageResult< Department> getPage(DepartmentQuery query);
+
+    /**
+     * 获取部门的分页列表
+     *
+     * @param query 查询参数
+     * @return 部门分页列表
+     */
+    PageResult<Department> getPage(DepartmentQuery query);
+
+    /**
+     * 部门列表 - 不分页
+     *
+     *
+     */
     List<Department> getList();
+
+    /**
+     * 保存或编辑部门
+     * @param department
+     */
     void saveOrEditDepartment(Department department);
 
+    /**
+     * 删除部门
+     */
     void removeDepartment(IdQuery query);
 }

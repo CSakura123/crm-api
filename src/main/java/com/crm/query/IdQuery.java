@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * @author 小c
+ * @author kimihiro
  */
 @Data
 public class IdQuery {
