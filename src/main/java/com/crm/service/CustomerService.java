@@ -8,9 +8,6 @@ import com.crm.query.IdQuery;
 import com.crm.vo.CustomerVO;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.rmi.ServerException;
 import java.util.List;
 
 /**
@@ -22,42 +19,10 @@ import java.util.List;
  * @since 2025-10-12
  */
 public interface CustomerService extends IService<Customer> {
-
-    /**
-     * 客户列表 - 分页
-     *
-     * @param query
-     * @return
-     */
     PageResult<CustomerVO> getPage(CustomerQuery query);
-
-    /**
-     * 导出客户信息
-     *
-     * @param query
-     * @param httpResponse
-     */
     void exportCustomer(CustomerQuery query, HttpServletResponse httpResponse);
-
-    /**
-     * 新增或修改客户信息
-     *
-     * @param customerVO
-     */
-    void saveOrUpdate(CustomerVO customerVO) throws ServerException;
-    /**
-     * 删除客户信息
-     * @param ids
-     */
+    void saveOrUpdate(CustomerVO customerVO);
     void removeCustomer(List<Integer> ids);
-    /**
-     * 客户转入公海
-     * @param idQuery
-     */
     void customerToPublicPool(IdQuery idQuery);
-    /**
-     * 领取客户
-     * @param idQuery
-     */
-    void publicPoolToolToPrivate(IdQuery idQuery) throws ServerException;
+    void publicPoolToPrivate(IdQuery idQuery);
 }

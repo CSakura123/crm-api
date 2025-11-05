@@ -1,17 +1,14 @@
 package com.crm.utils;
 
+
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * @author 小c
- */
 @Configuration
-public class ossClientConfig {
-
+public class OssClientConfig {
     @Value("${aliyun.oss.endpoint}")
     String endpoint;
     @Value("${aliyun.oss.accessKeyId}")

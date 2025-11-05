@@ -11,7 +11,6 @@ import com.crm.query.DepartmentQuery;
 import com.crm.query.IdQuery;
 import com.crm.service.DepartmentService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.crm.vo.SysManagerVO;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,43 +30,51 @@ import java.util.Objects;
 @Service
 @AllArgsConstructor
 public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Department> implements DepartmentService {
-
     private final SysManagerMapper sysManagerMapper;
-
     @Override
     public PageResult<Department> getPage(DepartmentQuery query) {
-        //1.构建条件查询
+        // 1、构造条件查询 wrapper
         LambdaQueryWrapper<Department> wrapper = new LambdaQueryWrapper<>();
-        if (query.getName() != null && query.getName().isEmpty()){
+        if (query.getName() != null && !query.getName().isEmpty()) {
             wrapper.like(Department::getName, query.getName());
         }
         List<Department> departments = baseMapper.selectList(wrapper);
-        if (departments.isEmpty()){
+        if (departments.isEmpty()) {
             return new PageResult<>(Collections.emptyList(), 0);
         }
 
-        //2.找到最小层级
+        // 2、找到最小的层级
         Integer minLevel = departments.stream().map(Department::getLevel).min(Integer::compareTo).orElse(0);
-        //3.筛选顶级部门分页
-        List<Department> topDepartment = departments.stream().filter(department -> department.getLevel().equals(minLevel)).toList();
 
-        //4.顶级部门分页
+        // 3、筛选出顶级的部门数据
+        List<Department> topDepartment = departments.stream()
+                .filter(department -> department.getLevel().equals(minLevel))
+                .toList();
+
+        // 4、顶级部门分页
         int total = topDepartment.size();
-        int formIndex = (query.getPage() - 1) * query.getLimit();
-        int toIndex = Math.min(formIndex + query.getLimit(), total);
-        if (formIndex >= total){
+        int fromIndex = (query.getPage() - 1) * query.getLimit();
+        int toIndex = Math.min(fromIndex + query.getLimit(), total);
+        if (fromIndex >= total) {
             return new PageResult<>(Collections.emptyList(), total);
         }
-        //5.顶级分页数据处理
-        List<Department> result = topDepartment.subList(formIndex, toIndex);
-        //6.构建父子系关系数据
-        result.forEach(item -> getChildList(item,departments));
 
+        // 5、顶级分页数据处理
+        List<Department> result = topDepartment.subList(fromIndex, toIndex);
+
+        // 6、构建父子关系数据
+        result.forEach(item -> getChildList(item, departments));
 
         return new PageResult<>(result, total);
     }
-
-
+    private Department getChildList(Department department, List<Department> list) {
+        list.forEach(item -> {
+            if (department.getId().equals(item.getParentId())) {
+                department.getChildren().add(getChildList(item, list));
+            }
+        });
+        return department;
+    }
     @Override
     public List<Department> getList() {
 //        1、查询父级部门列表,如果列表为空，返回空集合
@@ -90,21 +97,6 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
         });
         return parentDepartments;
     }
-
-
-    private Department getChildList(Department department, List<Department> list) {
-        list.forEach(item -> {
-            if (department.getId().equals(item.getParentId())) {
-                department.getChildren().add(getChildList(item, list));
-            }
-        });
-
-        return department;
-    }
-
-
-
-
     @Override
     public void saveOrEditDepartment(Department department) {
 //        1、查询新增/修改的部门名称是不是已经存在了，如果存在直接抛出异常
@@ -166,10 +158,9 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
         }
 
     }
-
     @Override
     public void removeDepartment(IdQuery query) {
-        List<SysManager> sysManagers = sysManagerMapper.selectList(new LambdaQueryWrapper<SysManager>().eq(SysManager::getDepartId, query.getId()));
+        List<SysManager> sysManagers = sysManagerMapper.selectList(new LambdaQueryWrapper<SysManager>().eq(SysManager::getId, query.getId()));
         if (!sysManagers.isEmpty()) {
             throw new ServerException("部门下有管理员,请解绑后再删除");
         }
@@ -179,10 +170,4 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     }
 
 }
-
-
-
-
-
-
 

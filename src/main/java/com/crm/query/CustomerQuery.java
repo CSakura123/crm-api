@@ -1,13 +1,12 @@
 package com.crm.query;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.crm.common.model.Query;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-/**
- * @author kimihiro
- */
 @Data
+@TableName("customer")
 public class CustomerQuery extends Query {
     @Schema(description = "客户名称")
     private String name;

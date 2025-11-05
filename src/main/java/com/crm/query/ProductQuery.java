@@ -1,16 +1,14 @@
 package com.crm.query;
 
 import com.crm.common.model.Query;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-/**
- * @author 小c
- */
 @Data
 public class ProductQuery extends Query {
-    @Schema(description = "商品名称")
+    @ApiModelProperty("商品名称")
     private String name;
-    @Schema(description = "商品状态")
-    private Byte status;
+
+    @ApiModelProperty("商品状态")
+    private Integer status;
 }

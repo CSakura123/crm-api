@@ -3,9 +3,6 @@ package com.crm.query;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/**
- * @author kimihiro
- */
 @Data
 public class IdQuery {
 

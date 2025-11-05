@@ -24,8 +24,7 @@ import lombok.Setter;
 @Setter
 @TableName("t_approval")
 @ApiModel(value = "Approval对象", description = "")
-public class
-Approval {
+public class Approval {
 
     @ApiModelProperty("主键")
     @TableId(value = "id", type = IdType.AUTO)

@@ -15,10 +15,13 @@ import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.List;
 
-
 /**
- * @author kimihiro
- */
+* @description: excel 写入工具类
+*
+* @author: ycshang
+*
+* @create: 2025-10-19 10:37
+**/
 public class ExcelUtils {
     /**
      * 导出 excel
@@ -46,7 +49,7 @@ public class ExcelUtils {
         contentWriteCellStyle.setWrapped(true);
         HorizontalCellStyleStrategy horizontalCellStyleStrategy = new HorizontalCellStyleStrategy(headWriteCellStyle, contentWriteCellStyle);
         try {
-            EasyExcel.write(getOutputStream(fileName, response), clazz).excelType(ExcelTypeEnum.XLSX).sheet(sheetName).registerWriteHandler(horizontalCellStyleStrategy).doWrite(data);
+            EasyExcel.write(getOutputStream(fileName, response), clazz).excelType(ExcelTypeEnum.XLS).sheet(sheetName).registerWriteHandler(horizontalCellStyleStrategy).doWrite(data);
         } catch (Exception e) {
             throw new ServerException(fileName + "文件导出失败");
         }
@@ -54,10 +57,11 @@ public class ExcelUtils {
     }
 
     private static OutputStream getOutputStream(String fileName, HttpServletResponse response) throws Exception {
-        fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        fileName = URLEncoder.encode(fileName, "UTF-8");
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
         response.setCharacterEncoding("utf-8");
-        response.setHeader("Content-Disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+        fileName = URLEncoder.encode(fileName, "UTF-8");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xls");
         return response.getOutputStream();
     }
 }

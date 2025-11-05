@@ -11,9 +11,6 @@ import org.hibernate.validator.constraints.Range;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-/**
- * @author kimihiro
- */
 @Data
 @Schema(description = "管理员")
 public class SysManagerVO implements Serializable {

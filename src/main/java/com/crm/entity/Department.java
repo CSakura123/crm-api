@@ -1,15 +1,6 @@
 package com.crm.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.baomidou.mybatisplus.annotation.*;
 import com.crm.utils.DateUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,14 +10,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * <p>
- * 
- * </p>
- *
- * @author crm
- * @since 2025-10-12
- */
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @TableName("t_department")
@@ -57,7 +44,7 @@ public class Department {
     @TableField(value = "delete_flag", fill = FieldFill.INSERT)
     @TableLogic
     @JsonIgnore
-    private Byte deleteFlag = 0;
+    private Byte deleteFlag=0;
 
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
@@ -73,4 +60,3 @@ public class Department {
     @TableField(exist = false)
     private List<Department> children = new ArrayList<>();
 }
-
