@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2025-10-12
  */
 public interface OperLogService extends IService<OperLog> {
-
+    void recordOperLog(OperLog operlog);
 }

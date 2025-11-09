@@ -8,9 +8,13 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * @author crm
+ */
 @Data
 @Schema(description = "管理员")
 public class SysManagerVO implements Serializable {

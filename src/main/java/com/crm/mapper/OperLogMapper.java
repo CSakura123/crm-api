@@ -11,6 +11,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author crm
  * @since 2025-10-12
  */
+
+
 public interface OperLogMapper extends BaseMapper<OperLog> {
 
 }

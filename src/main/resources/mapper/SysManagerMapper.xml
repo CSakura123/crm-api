@@ -4,14 +4,14 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.crm.entity.SysManager">
-        <id column="id" property="id" />
-        <result column="account" property="account" />
-        <result column="password" property="password" />
-        <result column="nickname" property="nickname" />
-        <result column="status" property="status" />
-        <result column="delete_flag" property="deleteFlag" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="account" property="account"/>
+        <result column="password" property="password"/>
+        <result column="nickname" property="nickname"/>
+        <result column="status" property="status"/>
+        <result column="delete_flag" property="deleteFlag"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <select id="getManagerPage" resultType="com.crm.vo.SysManagerVO">
@@ -21,8 +21,8 @@
         <if test="query.account != null and query.account != ''  ">
             and sm.account like concat('%',#{query.account},'%')
         </if>
-        <if test="query.type != null ">
-            and sm.type = #{query.type}
+        <if test="query.checkedDepartId != null ">
+            and sm.depart_id = #{query.checkedDepartId}
         </if>
         order by sm.create_time desc
     </select>
