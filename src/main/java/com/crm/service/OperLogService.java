@@ -1,7 +1,9 @@
 package com.crm.service;
 
+import com.crm.common.result.PageResult;
 import com.crm.entity.OperLog;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.crm.query.OperLogQuery;
 
 /**
  * <p>
@@ -13,4 +15,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface OperLogService extends IService<OperLog> {
     void recordOperLog(OperLog operlog);
+
+    PageResult<OperLog> getPage(OperLogQuery query);
 }

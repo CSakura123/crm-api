@@ -3,8 +3,14 @@ package com.crm.service;
 import com.crm.common.result.PageResult;
 import com.crm.entity.Contract;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.crm.query.ApprovalQuery;
 import com.crm.query.ContractQuery;
+import com.crm.query.CustomerTrendQuery;
+import com.crm.query.IdQuery;
 import com.crm.vo.ContractVO;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -17,4 +23,8 @@ import com.crm.vo.ContractVO;
 public interface ContractService extends IService<Contract> {
     PageResult<ContractVO> getPage(ContractQuery query);
     void saveOrUpdate(ContractVO contractVO);
+
+    void startApproval(IdQuery idQuery);
+
+    void approvalContract(ApprovalQuery query);
 }

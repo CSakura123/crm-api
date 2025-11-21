@@ -77,4 +77,7 @@ public class ContractVO {
     private LocalDate endTime;
 
     List<ProductVO> products;
+
+    @ApiModelProperty("审核原因")
+    private String approvalReason;
 }

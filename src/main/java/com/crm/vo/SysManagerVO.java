@@ -53,4 +53,7 @@ public class SysManagerVO implements Serializable {
     @JsonFormat(pattern = DateUtils.DATE_TIME_PATTERN)
     private LocalDateTime createTime;
 
+    @Schema(description = "邮箱")
+    private String email;
+
 }

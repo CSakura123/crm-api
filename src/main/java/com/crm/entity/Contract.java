@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.crm.enums.ContractStatus;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -64,7 +65,7 @@ public class Contract {
 
     @ApiModelProperty("合同状态 0-初始化，1-审核通过，2-审核未通过")
     @TableField("status")
-    private Integer status;
+    private ContractStatus status = ContractStatus.PENDING;
 
     @ApiModelProperty("备注")
     @TableField("remark")
@@ -98,4 +99,10 @@ public class Contract {
     @ApiModelProperty("合同结束时间")
     @TableField("end_time")
     private LocalDate endTime;
+
+    @ApiModelProperty("审核原因")
+    @TableField("approval_reason")
+    private String approvalReason;
+
+
 }

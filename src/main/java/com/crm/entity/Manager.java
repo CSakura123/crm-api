@@ -62,4 +62,8 @@ public class Manager {
     @ApiModelProperty("部门id")
     @TableField("depart_id")
     private Integer departId;
+
+    @ApiModelProperty("邮箱")
+    @TableField("email")
+    private String email;
 }

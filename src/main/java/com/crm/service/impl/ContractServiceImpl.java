@@ -5,14 +5,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.crm.common.exception.ServerException;
 import com.crm.common.result.PageResult;
 import com.crm.convert.ContractConvert;
-import com.crm.entity.Contract;
-import com.crm.entity.ContractProduct;
-import com.crm.entity.Customer;
-import com.crm.entity.Product;
-import com.crm.mapper.ContractMapper;
-import com.crm.mapper.ContractProductMapper;
-import com.crm.mapper.ProductMapper;
+import com.crm.entity.*;
+import com.crm.enums.ContractStatus;
+import com.crm.mapper.*;
+import com.crm.query.ApprovalQuery;
 import com.crm.query.ContractQuery;
+import com.crm.query.IdQuery;
 import com.crm.security.user.SecurityUser;
 import com.crm.service.ContractService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -20,12 +18,19 @@ import com.crm.vo.ContractVO;
 import com.crm.vo.ProductVO;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static com.crm.utils.NumberUtils.generateContractNumber;
@@ -40,9 +45,13 @@ import static com.crm.utils.NumberUtils.generateContractNumber;
  */
 @Service
 @AllArgsConstructor
+@Slf4j
 public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> implements ContractService {
     private final ProductMapper productMapper;
     private final ContractProductMapper contractProductMapper;
+    private final ApprovalMapper approvalMapper;
+    private final ManagerMapper managerMapper;
+    private final JavaMailSender mailSender;
 
     @Override
     public PageResult<ContractVO> getPage(ContractQuery query) {
@@ -98,7 +107,9 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         } else {
             Contract dbContract = baseMapper.selectById(contract.getId());
             if (dbContract == null) throw new ServerException("合同不存在");
-            if (dbContract.getStatus() == 1) throw new ServerException("该合同已审核通过，请勿修改");
+            if (dbContract.getStatus() == ContractStatus.APPROVED) {
+                throw new ServerException("该合同已审核通过，请勿修改");
+            }
             baseMapper.updateById(contract);
         }
         if (contract.getReceivedAmount() == null) {
@@ -108,6 +119,56 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         handleContractProducts(contract.getId(), contractVO.getProducts());
 
     }
+
+    @Override
+    public void startApproval(IdQuery idQuery) {
+        Contract contract = baseMapper.selectById(idQuery.getId());
+        if (contract == null) {
+            throw new ServerException("合同不存在");
+        }
+        if (!ContractStatus.PENDING.getCode().equals(contract.getStatus())) {
+            throw new ServerException("该合同不是待审核状态，请勿重复提交");
+        }
+        contract.setStatus(ContractStatus.PENDING);
+        baseMapper.updateById(contract);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void approvalContract(ApprovalQuery query) {
+        Contract contract = baseMapper.selectById(query.getId());
+        if (contract == null) {
+            throw new ServerException("合同不存在");
+        }
+
+        // 用户输入的审核原因，保存到合同表
+        String approvalReason = query.getReason();
+
+        // 默认的审批评论内容，保存到审批表
+        String approvalComment = query.getType() == 0 ? "合同审核通过" : "合同审核未通过";
+
+        Integer contractStatus = query.getType() == 0 ?
+                ContractStatus.APPROVED.getCode() : ContractStatus.REJECTED.getCode();
+        Approval approval = new Approval();
+        approval.setType(0);
+        approval.setStatus(query.getType());
+        approval.setCreaterId(SecurityUser.getManagerId());
+        approval.setContractId(contract.getId());
+        approval.setComment(approvalComment);
+        approvalMapper.insert(approval);
+
+        contract.setApprovalReason(approvalReason);
+        contract.setStatus(ContractStatus.fromCode(contractStatus));
+        baseMapper.updateById(contract);
+        // 如果审核通过，发送邮件通知
+            sendApprovalNotificationAsync(contract);
+    }
+
+    private void sendApprovalNotificationAsync(Contract contract) {
+        // 异步执行邮件发送
+        CompletableFuture.runAsync(() -> sendApprovalNotification(contract));
+    }
+
 
     private void handleContractProducts(Integer contractId, List<ProductVO> newProductList) {
         if (newProductList == null) return;
@@ -196,4 +257,49 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
     }
 
 
+
+
+  @Async
+public void sendApprovalNotification(Contract contract) {
+    try {
+        log.info("开始发送审批通知，合同ID: {}", contract.getId());
+
+        // 查询创建者信息
+        Manager creator = managerMapper.selectById(contract.getCreaterId());
+        log.info("创建者信息: {}", creator);
+
+        // 只有当创建者存在且有有效邮箱时才发送邮件
+        if (creator != null && StringUtils.isNotBlank(creator.getEmail())) {
+            String recipientEmail = creator.getEmail();
+            log.info("使用创建者邮箱: {}", recipientEmail);
+
+            // 根据合同状态确定邮件内容
+            String subject;
+            String text;
+            if (contract.getStatus() == ContractStatus.APPROVED) {
+                subject = "合同审核通过通知";
+                text = "您创建的合同[" + contract.getName() + "]已审核通过，合同编号：" + contract.getNumber();
+            } else {
+                subject = "合同审核结果通知";
+                String reason = StringUtils.isNotBlank(contract.getApprovalReason())
+                    ? "，原因：" + contract.getApprovalReason()
+                    : "";
+                text = "您创建的合同[" + contract.getName() + "]审核未通过" + reason + "，合同编号：" + contract.getNumber();
+            }
+
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("3068195512@qq.com");
+            message.setTo(recipientEmail);
+            message.setSubject(subject);
+            message.setText(text);
+            mailSender.send(message);
+            log.info("邮件发送成功，收件人: {}", recipientEmail);
+        } else {
+            log.warn("创建者邮箱为空或不存在，不发送邮件通知");
+        }
+
+    } catch (Exception e) {
+        log.error("发送邮件通知失败，合同ID: " + contract.getId(), e);
+    }
+}
 }

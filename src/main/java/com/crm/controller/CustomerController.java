@@ -11,6 +11,7 @@ import com.crm.entity.Customer;
 import com.crm.enums.BusinessType;
 import com.crm.mapper.CustomerMapper;
 import com.crm.query.CustomerQuery;
+import com.crm.query.CustomerTrendQuery;
 import com.crm.query.IdQuery;
 import com.crm.service.CustomerService;
 import com.crm.vo.CustomerVO;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -50,17 +52,20 @@ public class CustomerController {
 
     @PostMapping("export")
     @Operation(summary = "客户列表-导出")
+    @Log(title = "客户列表-导出参数",businessType = BusinessType.EXPORT)
     public void exportCustomer(@RequestBody CustomerQuery query, HttpServletResponse response) {
         customerService.exportCustomer(query, response);
     }
     @PostMapping("saveOrUpdate")
     @Operation(summary = "保存或更新客户")
+    @Log(title = "保存或更新客户参数",businessType = BusinessType.INSERT_OR_UPDATE)
     public Result saveOrUpdate(@RequestBody @Validated CustomerVO customerVO) {
         customerService.saveOrUpdate(customerVO);
         return Result.ok();
     }
     @PostMapping("remove")
     @Operation(summary = "删除客户信息")
+    @Log(title = "删除客户信息参数",businessType = BusinessType.DELETE)
     public Result removeCustomer(@RequestBody List<Integer> ids){
         if(ids.isEmpty()){
             throw new ServerException("请选择要删除的客户信息");
@@ -70,14 +75,22 @@ public class CustomerController {
     }
     @PostMapping("toPublic")
     @Operation(summary = "转为公海客户")
+    @Log(title = "转为公海客户参数",businessType = BusinessType.INSERT_OR_UPDATE)
     public Result customerToPublicPool(@RequestBody @Validated IdQuery idQuery) {
         customerService.customerToPublicPool(idQuery);
         return Result.ok();
     }
     @PostMapping("toPrivate")
     @Operation(summary = "领取客户")
+    @Log(title = "领取客户参数",businessType = BusinessType.INSERT_OR_UPDATE)
     public Result publicPoolToPrivate(@RequestBody @Validated IdQuery idQuery) {
         customerService.publicPoolToPrivate(idQuery);
         return Result.ok();
+    }
+    @PostMapping("/getCustomerTrendData")
+    @Operation(summary = "客户变化趋势数据")
+    @Log(title = "客户变化趋势", businessType = BusinessType.SELECT)
+    public Result<Map<String, List>> getCustomerTrendData(@RequestBody CustomerTrendQuery query) {
+        return Result.ok(customerService.getCustomerTrendData(query));
     }
 }
