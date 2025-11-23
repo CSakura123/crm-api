@@ -6,6 +6,7 @@ import com.crm.vo.CustomerTrendVO;
 import com.github.yulichang.base.MPJBaseMapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -20,4 +21,5 @@ public interface CustomerMapper extends MPJBaseMapper<Customer> {
     List<CustomerTrendVO> getTradeStatistics(@Param("query") CustomerTrendQuery query);
     List<CustomerTrendVO> getTradeStatisticsByDay(@Param("query") CustomerTrendQuery query);
     List<CustomerTrendVO> getTradeStatisticsByWeek(@Param("query") CustomerTrendQuery query);
+    int countByCreateDate(@Param("date") LocalDate date);
 }

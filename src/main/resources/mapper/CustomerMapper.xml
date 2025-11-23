@@ -71,4 +71,9 @@
         tradeTime;
     </select>
 
+    <select id="countByCreateDate" resultType="int">
+        SELECT COUNT(*) FROM t_customer
+        WHERE DATE(create_time) = #{date}
+    </select>
+
 </mapper>
